@@ -68,20 +68,41 @@ export class EntropyProcessor {
     const diceRegex = /^[1-6]+$/
     const decimalRegex = /^[0-9]+$/
     const hexRegex = /^[0-9a-f]+$/
-    const cardRegex = /^[a2-9tjqk][cdhs]+$/
+    // Card regex: pairs of rank+suit, e.g., 'ac', 'js', '2h'
+    const cardRegex = /^([a2-9tjqk][cdhs])+$/
 
+    // Check for cards first as they have specific patterns
+    if (cardRegex.test(input) && input.length % 2 === 0) return 'cards'
+    
+    // Check more specific patterns before more general ones
     if (binaryRegex.test(input)) return 'binary'
-    if (base6Regex.test(input)) return 'base6'
+    if (base6Regex.test(input)) return 'base6' 
     if (diceRegex.test(input)) return 'dice'
-    if (cardRegex.test(input)) return 'cards'
     if (decimalRegex.test(input)) return 'decimal'
     if (hexRegex.test(input)) return 'hexadecimal'
+
+    // For mixed content, try to detect if it contains binary-like patterns
+    const filteredBinary = input.replace(/[^01]/g, '')
+    if (filteredBinary.length > input.length * 0.5) return 'binary'
 
     // Default to hexadecimal for mixed content
     return 'hexadecimal'
   }
 
   private filterByType(input: string, type: EntropyType): string {
+    if (type === 'cards') {
+      // For cards, filter by pairs (rank+suit)
+      const validCards = Object.keys(this.eventBits[type])
+      let result = ''
+      for (let i = 0; i < input.length; i += 2) {
+        const card = input.slice(i, i + 2)
+        if (validCards.includes(card)) {
+          result += card
+        }
+      }
+      return result
+    }
+    
     const validChars = Object.keys(this.eventBits[type])
     return input.split('').filter(char => validChars.includes(char)).join('')
   }

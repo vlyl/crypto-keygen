@@ -37,8 +37,11 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
+    command: 'pnpm run dev',
     url: 'http://localhost:8000',
     reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+    stderr: 'pipe',
+    stdout: 'pipe',
   },
 })

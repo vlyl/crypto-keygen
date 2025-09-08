@@ -92,9 +92,6 @@ jobs:
       
       - name: Security audit
         run: pnpm audit --audit-level moderate
-      
-      - name: Check for vulnerable dependencies
-        run: pnpm exec npm-audit-ci@^3 --moderate
 
   build-and-deploy:
     runs-on: ubuntu-latest

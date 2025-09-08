@@ -114,23 +114,28 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(text)
       return true
-    } else {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = text
-      textArea.style.position = 'fixed'
-      textArea.style.left = '-999999px'
-      textArea.style.top = '-999999px'
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      
-      const result = document.execCommand('copy')
-      document.body.removeChild(textArea)
-      return result
     }
   } catch (error) {
     console.error('Failed to copy to clipboard:', error)
+    // Fall through to execCommand fallback
+  }
+
+  try {
+    // Fallback for older browsers or when clipboard API fails
+    const textArea = document.createElement('textarea')
+    textArea.value = text
+    textArea.style.position = 'fixed'
+    textArea.style.left = '-999999px'
+    textArea.style.top = '-999999px'
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+    
+    const result = document.execCommand('copy')
+    document.body.removeChild(textArea)
+    return result
+  } catch (error) {
+    console.error('Failed to copy to clipboard with fallback:', error)
     return false
   }
 }

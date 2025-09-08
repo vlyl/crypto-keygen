@@ -93,22 +93,18 @@ describe('format utilities', () => {
 
   describe('copyToClipboard', () => {
     it('should copy using modern clipboard API', async () => {
-      const mockWriteText = vi.fn().mockResolvedValue(undefined)
-      Object.defineProperty(navigator, 'clipboard', {
-        value: { writeText: mockWriteText },
-      })
+      const mockWriteText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
 
       const result = await copyToClipboard('test text')
       
       expect(result).toBe(true)
       expect(mockWriteText).toHaveBeenCalledWith('test text')
+      
+      mockWriteText.mockRestore()
     })
 
     it('should handle clipboard API failure', async () => {
-      const mockWriteText = vi.fn().mockRejectedValue(new Error('Failed'))
-      Object.defineProperty(navigator, 'clipboard', {
-        value: { writeText: mockWriteText },
-      })
+      const mockWriteText = vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('Failed'))
 
       // Mock document.execCommand for fallback
       const mockExecCommand = vi.fn().mockReturnValue(true)
@@ -118,13 +114,12 @@ describe('format utilities', () => {
       
       expect(result).toBe(true)
       expect(mockExecCommand).toHaveBeenCalledWith('copy')
+      
+      mockWriteText.mockRestore()
     })
 
     it('should return false on complete failure', async () => {
-      // Remove clipboard API
-      Object.defineProperty(navigator, 'clipboard', {
-        value: undefined,
-      })
+      const mockWriteText = vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('Failed'))
 
       // Mock failing execCommand
       const mockExecCommand = vi.fn().mockReturnValue(false)
@@ -133,6 +128,8 @@ describe('format utilities', () => {
       const result = await copyToClipboard('test text')
       
       expect(result).toBe(false)
+      
+      mockWriteText.mockRestore()
     })
   })
 })

@@ -83,13 +83,34 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: './src/test/setup.ts',
+    include: [
+      'src/**/__tests__/**/*.{js,ts,jsx,tsx}',
+      'src/**/*.{test,spec}.{js,ts,jsx,tsx}'
+    ],
+    exclude: [
+      'node_modules/',
+      '**/e2e/**',
+      '**/*.e2e.{js,ts}',
+      '**/*.spec.{js,ts}',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      include: [
+        'src/**/*.{ts,tsx}'
+      ],
       exclude: [
         'node_modules/',
         'src/test/',
-        '**/*.d.ts'
+        'src/**/__tests__/**',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.spec.{ts,tsx}',
+        '**/*.d.ts',
+        'src/main.tsx',
+        'src/vite-env.d.ts',
+        'backup/',
+        'libs/',
+        'public/'
       ]
     }
   }

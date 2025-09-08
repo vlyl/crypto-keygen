@@ -70,3 +70,5 @@ bip39-standalone.html.sha256
 # Temporary directories
 tmp/
 temp/
+
+.idea
